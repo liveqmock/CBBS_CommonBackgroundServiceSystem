@@ -8,7 +8,8 @@ public class CommunicationProtocol {
 	public String  processInput(String inputstr){
 
 		String resultstr = "";
-		final int packetLength = 67;
+		final int packetHead = 8;
+		final int packetLength = packetHead+67;
 
 		//首先判断位数是否足够
 		if(packetLength!=inputstr.length()){
@@ -17,10 +18,11 @@ public class CommunicationProtocol {
 		}
 
 		//拆包
-		String txnCod = inputstr.substring(0,6);
-		String encryStatus = inputstr.substring(6,7);//0:解密;1:加密
-		String password = inputstr.substring(7,27).trim();
-		String sessionId = inputstr.substring(27,67);
+		String strInUse = inputstr.substring(8);
+		String txnCod = strInUse.substring(0,6);
+		String encryStatus = strInUse.substring(6,7);//0:解密;1:加密
+		String password = strInUse.substring(7,27).trim();
+		String sessionId = strInUse.substring(27,67);
 
 		//通过判断交易码进行处理
 		if("444555".equals(txnCod)){
