@@ -7,6 +7,10 @@ import java.io.*;
 public class MyServer {
 
 	public static void main (String args[]) throws IOException{
+		MyServer.serverStart();
+	}
+	
+	private static void serverStart() throws IOException{
 		//Server needs a ServerSockets Objects as its parameter
 		ServerSocket serverSocket = null;
 		//Server would like to utilize the multiple threads to deal with the communication
