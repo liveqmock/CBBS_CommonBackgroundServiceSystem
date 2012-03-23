@@ -1,4 +1,2 @@
-set CLASSPATH=$CLASSPATH:./lib/BocomDES.jar
-export $CLASSPATH
 cd ./bin
-java -classpath $CLASSPATH com/bankcomm/gd/MyServer
+nohup java -classpath ../lib/BocomDES.jar:. com/bankcomm/gd/MyServer

@@ -9,20 +9,23 @@ public class CommunicationProtocol {
 
 		String resultstr = "";
 		final int packetHead = 8;
-		final int packetLength = packetHead+67;
+		int packetLength = packetHead+67;
 
+		//System.out.println(packetLength);
 		//首先判断位数是否足够
 		if(packetLength!=inputstr.length()){
 			System.out.println(inputstr.length());
-			return this.rspCode_Msg("报文长度不正确");
+			return this.ErrMsg("报文长度不正确");
 		}
 
 		//拆包
-		String strInUse = inputstr.substring(8);
+		String strInUse = inputstr.substring(8,packetLength);
+		System.out.println(strInUse);
 		String txnCod = strInUse.substring(0,6);
 		String encryStatus = strInUse.substring(6,7);//0:解密;1:加密
 		String password = strInUse.substring(7,27).trim();
 		String sessionId = strInUse.substring(27,67);
+		System.out.println(txnCod+"|"+encryStatus+"|"+password+"|"+sessionId);
 
 		//通过判断交易码进行处理
 		if("444555".equals(txnCod)){
@@ -35,7 +38,7 @@ public class CommunicationProtocol {
 			    }
 			    catch (Exception ex) {
 			      System.out.println(ex);
-			      resultstr=this.rspCode_Msg("解密失败");
+			      resultstr=this.ErrMsg("解密失败");
 			    }
 			}else if("1".equals(encryStatus)){//如果是1,走加密流程
 
@@ -45,20 +48,20 @@ public class CommunicationProtocol {
 			    }
 			    catch (Exception ex) {
 			      System.out.println(ex);
-			      resultstr=this.rspCode_Msg("加密失败");
+			      resultstr=this.ErrMsg("加密失败");
 			    }
 			}else{//传送标志位异常
-				resultstr=this.rspCode_Msg("加解密标志出错");
+				resultstr=this.ErrMsg("加解密标志出错");
 			}
 
 		}else{//无此交易码
-			resultstr=this.rspCode_Msg("交易码错误");
+			resultstr=this.ErrMsg("交易码错误");
 		}
 
-		return resultstr;
+		return "00000026"+this.NormalMsg(resultstr);
 	}
 	
-	private String rspCode_Msg(String msg){
+	private String ErrMsg(String msg){
 		final String ERRCODE = "999999";
 		final int msgLength = 20;
 		String inputMsg = "";
@@ -71,8 +74,25 @@ public class CommunicationProtocol {
 		}else{
 			inputMsg = msg;
 		}
+		System.out.println(inputMsg);
 		return ERRCODE+inputMsg;
-		
+
+	}
+	private String NormalMsg(String msg){
+		final String ERRCODE = "000000";
+		final int msgLength = 20;
+		String inputMsg = "";
+		if(msgLength < msg.length()){
+			inputMsg = msg.substring(0, 20);
+		}else if(msgLength > msg.length()){
+			byte   b[]   =   new   byte[msgLength-msg.length()]; 
+			Arrays.fill(b, (byte)' '); 
+			inputMsg = msg + new String(b); 
+		}else{
+			inputMsg = msg;
+		}
+		System.out.println(inputMsg);
+		return ERRCODE+inputMsg;
 
 	}
 }

@@ -30,6 +30,7 @@ public class MultiServerThread extends Thread {
 			while((userInput=br.readLine())!=null){
 				System.out.println("SERVER RECEIVES THE DATA FRMO CLIENT SIDE: "+userInput);
 				serverFeedback=cp.processInput(userInput);
+				System.out.println("SERVER RESPONSE THE DATA TO CLIENT SIDE: "+serverFeedback);
 				pw.println(serverFeedback);
 				if(serverFeedback.equalsIgnoreCase("exit")){
 					break;
