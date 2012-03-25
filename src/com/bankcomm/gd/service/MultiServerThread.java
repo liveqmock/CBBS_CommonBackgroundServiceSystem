@@ -1,4 +1,4 @@
-package com.bankcomm.gd;
+package com.bankcomm.gd.service;
 
 import java.net.*;
 import java.io.*;

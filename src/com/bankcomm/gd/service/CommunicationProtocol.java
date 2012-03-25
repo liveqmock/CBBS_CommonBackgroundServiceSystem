@@ -1,4 +1,4 @@
-package com.bankcomm.gd;
+package com.bankcomm.gd.service;
 
 import java.util.Arrays;
 import com.bocom.eb.des.EBDES;

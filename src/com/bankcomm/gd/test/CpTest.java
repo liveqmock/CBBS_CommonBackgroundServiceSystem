@@ -1,6 +1,6 @@
 package com.bankcomm.gd.test;
 
-import com.bankcomm.gd.CommunicationProtocol;
+import com.bankcomm.gd.service.CommunicationProtocol;
 
 public class CpTest {
 
