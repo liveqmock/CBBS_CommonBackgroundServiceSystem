@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.bankcomm.gd.service;
+package com.bankcomm.gd.cbbs;
 
 /**
  * @author Administrator

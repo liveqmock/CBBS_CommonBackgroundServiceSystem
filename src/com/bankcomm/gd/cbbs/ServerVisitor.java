@@ -1,18 +1,39 @@
-package com.bankcomm.gd.service;
+package com.bankcomm.gd.cbbs;
 
 import java.net.*;
 import java.io.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+public class ServerVisitor {
 
-public class MyClient {
-	public static void main (String args[]) throws IOException{
+	final int PORT_NUMBER;
+	final String SERVER_NAME;
+	private Log log = LogFactory.getLog(ServerVisitor.class);
+
+	public ServerVisitor(){
+		PORT_NUMBER = Integer.valueOf(PropertiesLoader.getByName("PORT_NUMBER"));
+		SERVER_NAME = PropertiesLoader.getByName("SERVER_NAME");
+		if(0==PORT_NUMBER||null==SERVER_NAME){
+			
+		}
+		log.info("==========================================");
+		log.info("==========================================");
+	}
+
+	public static void main (String args[]){
+		new ServerVisitor().startVisitor();
+	}
+
+	/**
+	 * 
+	 * @deprecated
+	 */
+	public void startVisitor(){
 		Socket socket = null;
 		PrintWriter pw = null;
 		BufferedReader br = null;
-		
-		final int PORT_NUMBER = 8800;
-		final String SERVER_NAME = "localhost";
 		
 		
 		try{
@@ -53,8 +74,6 @@ public class MyClient {
 	    userType.close();
 	    socket.close();
 		
-	}
-	
-	    
 
+	}
 }

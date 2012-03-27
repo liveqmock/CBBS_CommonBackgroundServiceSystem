@@ -1,4 +1,4 @@
-package com.bankcomm.gd.service;
+package com.bankcomm.gd.cbbs;
 
 import java.net.*;
 import java.io.*;

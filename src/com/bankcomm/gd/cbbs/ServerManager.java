@@ -1,8 +1,8 @@
-package com.bankcomm.gd.service;
+package com.bankcomm.gd.cbbs;
 
 import java.util.List;
 import java.util.ArrayList;
-import com.bankcomm.gd.service.CommonServer;
+import com.bankcomm.gd.cbbs.CommonServer;
 
 /**
  * 本类用于管理所有的服务器
