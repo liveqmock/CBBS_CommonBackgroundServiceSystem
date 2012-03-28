@@ -14,7 +14,7 @@ public class PropertiesLoader {
 	private static Properties props = new Properties();
 	private Log log = LogFactory.getLog(PropertiesLoader.class);
 
-	public PropertiesLoader() throws Exception{
+	public PropertiesLoader(){
 		try{
 			props.load(new FileInputStream(propertyFile));
 		}catch(FileNotFoundException e){
@@ -24,13 +24,16 @@ public class PropertiesLoader {
 			log.error("初始化PropertiesLoader对象失败:"+e.getMessage());
 			props = null;
 		}
-		throw new Exception();
 	}
 
-	public static String getByName(String propName){
+	public String getByName(String propName){
 		if(null == props){
 			return null;
 		}
 		return props.getProperty(propName);
+	}
+
+	public static void main (String args[]){
+		System.out.println(new PropertiesLoader().getByName("PORT_NUMBER"));
 	}
 }
