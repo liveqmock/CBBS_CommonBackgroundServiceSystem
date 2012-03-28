@@ -1,4 +1,4 @@
-package com.bankcomm.gd.cbbs.util;
+package com.bankcomm.gd.cbbs;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -8,15 +8,19 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class PropertiesLoader {
+public class PropertiesLoader {
 
-	private String propertyFile = null;
+	private final String propertyFile;
 	private static Properties props = new Properties();
 	private Log log = LogFactory.getLog(PropertiesLoader.class);
 
-	public PropertiesLoader(){
+	/**
+	 * 使用对应配置文件构造实例
+	 * @param configFile
+	 */
+	public PropertiesLoader(String configFile){
 
-		this.init();
+		this.propertyFile=configFile;
 		if(null==this.propertyFile){
 			log.error("配置文件为空");
 		}else{
@@ -33,11 +37,13 @@ public abstract class PropertiesLoader {
 	}
 
 	/**
-	 * 用于初始化配置文件
+	 * 不允许无参数实例化
 	 *
 	 */
-	protected abstract void init();
-	
+	private PropertiesLoader(){
+		this.propertyFile=null;
+	}
+
 	/**
 	 * 得到配置值,<b>返回值可能为null,需要对返回值进行判断</b>
 	 * @param propName 配置项名称
@@ -51,7 +57,9 @@ public abstract class PropertiesLoader {
 		}
 	}
 
-	/*public static void main (String args[]){
-		System.out.println(new PropertiesLoader().getByName("PORT_NUMBER"));
-	}*/
+	public static void main (String args[]){
+		PropertiesLoader tester = new PropertiesLoader("./ini/ServerConfig.ini");
+		System.out.println("PORT_NUMBER:"+tester.getByName("PORT"));
+		System.out.println("NOTHING:"+tester.getByName("NOTHING"));
+	}
 }
