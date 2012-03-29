@@ -17,7 +17,7 @@ public class ServerVisitor {
 	private final int PORT;
 	private final String SERVER;
 	private final int TIMEOUT=10000;
-	private Log log = LogFactory.getLog(ServerVisitor.class);
+	private Log log = LogFactory.getLog(this.getClass());
 
 	public ServerVisitor(){
 		PropertiesLoader propLoader = new PropertiesLoader("./ini/ServerConfig.ini");
