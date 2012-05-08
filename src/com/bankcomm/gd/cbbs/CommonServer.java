@@ -3,29 +3,61 @@ package com.bankcomm.gd.cbbs;
 import java.net.*;
 import java.io.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+/**
+ * 通用后台系统主类，用于守护相关程序端口
+ * @author gu.qm
+ *
+ */
 public class CommonServer {
 
-	public static void main (String args[]) throws IOException{
-		CommonServer.serverStart();
+	private final int PORT;
+	private final String SERVER;
+	private Log log = LogFactory.getLog(this.getClass());
+
+	/**
+	 * 构造函数，初始化./ini/ServerConfig.ini文件里面的相关配置信息
+	 *
+	 */
+	public CommonServer(){
+		PropertiesLoader propLoader = new PropertiesLoader("../ini/ServerConfig.ini");
+		SERVER = propLoader.getByName("SERVER");
+		PORT = Integer.valueOf(null==propLoader.getByName("PORT")?"0":propLoader.getByName("PORT"));
+		if(0==PORT||null==SERVER){
+			log.error("服务器地址或端口为空");
+			System.exit(1);
+		}else{
+			log.info("==========================================");
+			log.info("初始化成功:服务器地址为["+SERVER+"],端口为["+PORT+"]");
+		}
 	}
-	
-	private static void serverStart() throws IOException{
+
+	/**
+	 * 程序入口
+	 * @param args 参数无意义
+	 * @throws IOException
+	 */
+	public static void main (String args[]) throws IOException{
+		new CommonServer().serverStart();
+	}
+
+	private void serverStart() throws IOException{
 		//Server needs a ServerSockets Objects as its parameter
 		ServerSocket serverSocket = null;
 		//Server would like to utilize the multiple threads to deal with the communication
 		boolean listening = true;
-		int socketPost = 3894; 
 		
 		try{
-			serverSocket = new ServerSocket(socketPost);
+			serverSocket = new ServerSocket(this.PORT);
 		}catch(IOException ioe){
-			System.err.println("Cannot listen the port "+socketPost+". Maybe this port is in use");
+			log.error("Cannot listen the port "+this.PORT+". Maybe this port is in use");
 			System.exit(1);
 		}
 		
 		while(listening){
-			System.out.println("The ServerSocket["+socketPost+"] is now listening for the request");
+			log.info("The ServerSocket["+this.PORT+"] is now listening for the request");
 			new MultiServerThread(serverSocket.accept()).start();				
 		}
 		serverSocket.close();
