@@ -14,7 +14,7 @@ public class IMTest {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//System.out.println(new IMTest().PORT_NUMBER);
-		PropertiesLoader.getByName("");
+		//PropertiesLoader.getByName("");
 	}
 	/*final int PORT_NUMBER;
 	final String SERVER_NAME;
