@@ -1,7 +1,15 @@
 package com.bankcomm.gd.cbbs;
 
 import java.util.Arrays;
-
+import java.util.Map;
+import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.InetAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,7 +22,104 @@ import com.bocom.eb.des.EBDES;
  */
 public class CommunicationProtocol {
 
-	private Log log = LogFactory.getLog(this.getClass());
+	private static Map<String, Socket> sockets = new HashMap<String, Socket>();
+	private static Log log = LogFactory.getLog(CommunicationProtocol.class);
+
+	/**
+	 * 羊城通签到
+	 * @param inputstr 接收报文
+	 * @return 返回报文
+	 */
+	public static String YctLogin(String inputstr){
+		
+		PrintWriter pw = null;
+		BufferedReader br = null;
+		//从报文得到签到阶段标志
+		String Loglvl = inputstr.substring(0, 1);
+		//从报文得到Socket ID
+		String ScktID = inputstr.substring(1, 6);
+		//从报文得到外发报文
+		String ReqDat = inputstr.substring(6, 141);
+		if("1".equals(Loglvl)){//第一阶段处理
+			log.info("进入签到第一阶段处理...");
+			try {
+				//创建Socket并添加到Map中
+				Socket socket = new Socket("10.240.13.201",5003);
+				sockets.put(ScktID, socket);
+				//外发报文进行通讯并返回
+				pw = new PrintWriter(socket.getOutputStream(),true);
+				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				
+				log.info("外发羊城通报文...");
+				pw.println(ReqDat);
+				log.info("接收羊城通报文...");
+				return br.readLine();
+				
+			} catch (IOException e) {
+				log.error("IO错误:"+e.getMessage());
+				log.trace(e);
+				//通讯错误返回:272个9
+				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
+			}finally{
+			    try{
+			    	if(null!=pw){
+				    	pw.close();
+			    	}
+			    	if(null!=br){
+			    		br.close();
+			    	}
+			    }catch(IOException e){
+			    	log.error("释放资源错误:"+e.getMessage());
+			    }
+		    }
+			
+		}else if("2".equals(Loglvl)){//第二阶段处理
+			log.info("进入签到第二阶段处理...");
+			//判断Socket不为空
+			Socket socket = sockets.get(ScktID);
+			if(socket==null||socket.isClosed()){
+				return "999999999";
+			}
+			//外发报文进行通讯并返回
+			try {
+				pw = new PrintWriter(socket.getOutputStream(),true);
+				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				
+				log.info("外发羊城通报文...");
+				pw.println(ReqDat);
+				log.info("接收羊城通报文...");
+				return br.readLine();
+				
+			} catch (IOException e) {
+				log.error("IO错误:"+e.getMessage());
+				log.trace(e);
+				//通讯错误返回:9个9
+				return "999999999";
+			}finally{
+			    try{
+			    	if(null!=pw){
+				    	pw.close();
+			    	}
+			    	if(null!=br){
+			    		br.close();
+			    	}
+					//返回后释放Socket
+			    	if(null!=socket){
+			    		socket.close();
+			    	}
+					//从sockets中删除相关socket
+			    	sockets.remove(ScktID);
+			    }catch(IOException e){
+			    	log.error("释放资源错误:"+e.getMessage());
+			    }
+		    }
+			
+		}else{//不存在的数据
+			return "999999999";
+		}
+		
+		//TODO 判断Socket是否超时,如果是立即释放Socket
+	}
 
 	/**
 	 * 处理收付通宝加解密逻辑

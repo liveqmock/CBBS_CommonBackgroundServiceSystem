@@ -49,8 +49,8 @@ public class MultiServerThread extends Thread {
 			while((strFromIcs=br.readLine())!=null){
 				log.info("SERVER RECEIVES THE DATA FRMO ICS: ["+strFromIcs+"]");
 				//new a protocol object
-				CommunicationProtocol cp = new CommunicationProtocol();
-				serverFeedback=cp.processInput(strFromIcs);
+				//CommunicationProtocol cp = new CommunicationProtocol();
+				serverFeedback=CommunicationProtocol.YctLogin(strFromIcs);
 				log.info("SERVER RESPONSE THE DATA TO ICS: ["+serverFeedback+"]");
 				pw.println(serverFeedback);
 				
