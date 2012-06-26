@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -13,6 +15,7 @@ import java.net.InetAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.bankcomm.gd.test.YctTest;
 import com.bocom.eb.des.EBDES;
 
 /**
@@ -31,91 +34,126 @@ public class CommunicationProtocol {
 	 * @return 返回报文
 	 */
 	public static String YctLogin(String inputstr){
-		
-		PrintWriter pw = null;
-		BufferedReader br = null;
+		log.info(sockets);
+		OutputStream osInside = null;
+		InputStream isInside = null;
+//		String _inputstr = String.valueOf(inputstr);
 		//从报文得到签到阶段标志
-		String Loglvl = inputstr.substring(0, 1);
+		String Loglvl = inputstr.substring(0,1);
+		System.out.println(Loglvl);
 		//从报文得到Socket ID
-		String ScktID = inputstr.substring(1, 6);
+		String ScktID = inputstr.substring(1, 8);
+		System.out.println(ScktID);
 		//从报文得到外发报文
-		String ReqDat = inputstr.substring(6, 141);
+		String ReqDat = inputstr.substring(8, 280);
+		System.out.println(ReqDat);
 		if("1".equals(Loglvl)){//第一阶段处理
-			log.info("进入签到第一阶段处理...");
+			//log.info("进入签到第一阶段处理...");
+			log.info("pross 1...");
 			try {
 				//创建Socket并添加到Map中
 				Socket socket = new Socket("10.240.13.201",5003);
+				log.info(socket);
 				sockets.put(ScktID, socket);
+				log.info(sockets.get(ScktID));
 				//外发报文进行通讯并返回
-				pw = new PrintWriter(socket.getOutputStream(),true);
-				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				
-				log.info("外发羊城通报文...");
-				pw.println(ReqDat);
-				log.info("接收羊城通报文...");
-				return br.readLine();
-				
+				osInside = socket.getOutputStream();
+				isInside = socket.getInputStream();
+				log.info("sending msg...");
+				osInside.write(YctTest.HexString2Bytes(ReqDat));
+
+				log.info("receiving msg...");
+				byte[] msgInputOutside = new byte[1024];
+				int totleRead = 0;
+				int hasRead =0;
+				//String content="";
+				while((hasRead=isInside.read(msgInputOutside))>0){
+					//fos.write(bbuf, 0, hasRead);
+					//fos.flush();
+					totleRead+=hasRead;
+				}
+				byte[] bit_msg = new byte[totleRead];
+				for(int i=0;i<totleRead;i++){
+					bit_msg[i]=msgInputOutside[i];
+				}
+				return YctTest.Bytes2HexString(bit_msg);
+
 			} catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
 				log.trace(e);
 				//通讯错误返回:272个9
 				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 			}finally{
-			    try{
-			    	if(null!=pw){
-				    	pw.close();
+			    /*try{
+			    	if(null!=osInside){
+			    		osInside.close();
 			    	}
-			    	if(null!=br){
-			    		br.close();
+			    	if(null!=isInside){
+			    		isInside.close();
 			    	}
 			    }catch(IOException e){
 			    	log.error("释放资源错误:"+e.getMessage());
-			    }
+			    }*/
 		    }
 			
 		}else if("2".equals(Loglvl)){//第二阶段处理
-			log.info("进入签到第二阶段处理...");
+			log.info("pross 2...");
 			//判断Socket不为空
 			Socket socket = sockets.get(ScktID);
+
+			log.info(socket);
 			if(socket==null||socket.isClosed()){
-				return "999999999";
+				return "socket null";
 			}
 			//外发报文进行通讯并返回
 			try {
-				pw = new PrintWriter(socket.getOutputStream(),true);
-				br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				//Socket socket = new Socket("10.240.13.201",5003);
+				//外发报文进行通讯并返回
+				osInside = socket.getOutputStream();
+				isInside = socket.getInputStream();
+				log.info("sending msg...");
+				osInside.write(YctTest.HexString2Bytes(ReqDat));
+
+				log.info("receiving msg...");
+				byte[] msgInputOutside = new byte[1024];
+				int totleRead = 0;
+				int hasRead =0;
+				//String content="";
+				while((hasRead=isInside.read(msgInputOutside))>0){
+					//fos.write(bbuf, 0, hasRead);
+					//fos.flush();
+					totleRead+=hasRead;
+				}
+				byte[] bit_msg = new byte[totleRead];
+				for(int i=0;i<totleRead;i++){
+					bit_msg[i]=msgInputOutside[i];
+				}
+				System.out.println(YctTest.Bytes2HexString(bit_msg));
+				return YctTest.Bytes2HexString(bit_msg);
 				
-				log.info("外发羊城通报文...");
-				pw.println(ReqDat);
-				log.info("接收羊城通报文...");
-				return br.readLine();
-				
-			} catch (IOException e) {
+			}  catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
 				log.trace(e);
-				//通讯错误返回:9个9
-				return "999999999";
-			}finally{
+				//通讯错误返回:272个9
+				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
+			}/*finally{
 			    try{
-			    	if(null!=pw){
-				    	pw.close();
+			    	if(null!=osInside){
+			    		osInside.close();
 			    	}
-			    	if(null!=br){
-			    		br.close();
+			    	if(null!=isInside){
+			    		isInside.close();
 			    	}
-					//返回后释放Socket
-			    	if(null!=socket){
-			    		socket.close();
-			    	}
-					//从sockets中删除相关socket
-			    	sockets.remove(ScktID);
 			    }catch(IOException e){
 			    	log.error("释放资源错误:"+e.getMessage());
 			    }
-		    }
+		    }*/
+		    
+
+
 			
 		}else{//不存在的数据
-			return "999999999";
+			return "未知类型";
 		}
 		
 		//TODO 判断Socket是否超时,如果是立即释放Socket
