@@ -34,49 +34,28 @@ public class CommunicationProtocol {
 	 * @return 返回报文
 	 */
 	public static String YctLogin(String inputstr){
-		log.info(sockets);
-		OutputStream osInside = null;
-		InputStream isInside = null;
-//		String _inputstr = String.valueOf(inputstr);
+		//log.info(sockets);
+
 		//从报文得到签到阶段标志
 		String Loglvl = inputstr.substring(0,1);
-		System.out.println(Loglvl);
+		log.info(Loglvl);
 		//从报文得到Socket ID
 		String ScktID = inputstr.substring(1, 8);
-		System.out.println(ScktID);
+		log.info(ScktID);
 		//从报文得到外发报文
 		String ReqDat = inputstr.substring(8, 280);
-		System.out.println(ReqDat);
+		log.info(ReqDat);
 		if("1".equals(Loglvl)){//第一阶段处理
 			//log.info("进入签到第一阶段处理...");
 			log.info("pross 1...");
 			try {
 				//创建Socket并添加到Map中
 				Socket socket = new Socket("10.240.13.201",5003);
-				log.info(socket);
+				//log.info(socket);
 				sockets.put(ScktID, socket);
-				log.info(sockets.get(ScktID));
+				//log.info(sockets.get(ScktID));
 				//外发报文进行通讯并返回
-				osInside = socket.getOutputStream();
-				isInside = socket.getInputStream();
-				log.info("sending msg...");
-				osInside.write(YctTest.HexString2Bytes(ReqDat));
-
-				log.info("receiving msg...");
-				byte[] msgInputOutside = new byte[1024];
-				int totleRead = 0;
-				int hasRead =0;
-				//String content="";
-				while((hasRead=isInside.read(msgInputOutside))>0){
-					//fos.write(bbuf, 0, hasRead);
-					//fos.flush();
-					totleRead+=hasRead;
-				}
-				byte[] bit_msg = new byte[totleRead];
-				for(int i=0;i<totleRead;i++){
-					bit_msg[i]=msgInputOutside[i];
-				}
-				return YctTest.Bytes2HexString(bit_msg);
+				return YctTest.Stream_Send(socket, ReqDat);
 
 			} catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
@@ -101,13 +80,13 @@ public class CommunicationProtocol {
 			//判断Socket不为空
 			Socket socket = sockets.get(ScktID);
 
-			log.info(socket);
+			//log.info(socket);
 			if(socket==null||socket.isClosed()){
 				return "socket null";
 			}
 			//外发报文进行通讯并返回
 			try {
-				//Socket socket = new Socket("10.240.13.201",5003);
+
 				//外发报文进行通讯并返回
 				osInside = socket.getOutputStream();
 				isInside = socket.getInputStream();
@@ -128,7 +107,7 @@ public class CommunicationProtocol {
 				for(int i=0;i<totleRead;i++){
 					bit_msg[i]=msgInputOutside[i];
 				}
-				System.out.println(YctTest.Bytes2HexString(bit_msg));
+				log.info(YctTest.Bytes2HexString(bit_msg));
 				return YctTest.Bytes2HexString(bit_msg);
 				
 			}  catch (IOException e) {

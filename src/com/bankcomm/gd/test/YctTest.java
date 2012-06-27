@@ -4,67 +4,126 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.IOException;
-import java.io.FileWriter;
-import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.InputStream;
 import java.net.Socket;
+import java.net.InetSocketAddress;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 public class YctTest {
 
+	private static Log log = LogFactory.getLog(YctTest.class);
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		String ReqDat = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
-
-		Socket socket = new Socket("10.240.13.201", 5003);
-		// 外发报文进行通讯并返回
-		PrintWriter pw = null;
-		BufferedReader br = null;
-		//pw = new PrintWriter(socket.getOutputStream(), true);
-		//br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		OutputStream os = socket.getOutputStream();
-		InputStream is = socket.getInputStream();
-		/*
-		 * if(!(socket.isConnected())){ log.info("socket is not connect");
-		 * }else{ log.info("socket is connect"); }
-		 */
-		byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
-		//char[] char_msg = new char[bit_msg.length];
-		/*for(int i=0;i<bit_msg.length;i++){
-			char_msg[i]=(char)bit_msg[i];
-		}*/
-		
-		System.out.println("sending msg...");
-		//pw.println(String.valueOf(char_msg));
-		/*FileWriter fw = new FileWriter("tmp");
-		fw.write(String.valueOf(char_msg));*/
-		FileOutputStream fos = new FileOutputStream("tmp2");
-		//fos.write(bit_msg);
-		os.write(bit_msg);
-		System.out.println("receiving msg...");
-		String content = null;
-		/*
-		 * for(int count=0;count<10000;count++){
-		 * if((content=br.readLine())!=null){ return content; } }
-		 */
-		/*while ((content = br.readLine()) != null) {
-			// log.info(arg0)
-		}*/
-		byte[] bbuf = new byte[136];
-		int hasRead =0;
-		while((hasRead=is.read(bbuf))>0){
-			fos.write(bbuf, 0, hasRead);
-			fos.flush();
-		}
-		fos.close();
-		content = Bytes2HexString(bbuf);
-		System.out.println(content);
+		Stream();
+		//Writer_Reader();
 
 	}
 
+	public static void Writer_Reader() throws IOException{
+		PrintWriter pw = null;
+		BufferedReader br = null;
+		Socket socket = new Socket();
+		socket.connect(new InetSocketAddress("10.240.13.201", 5003));
+		pw = new PrintWriter(socket.getOutputStream(),true);
+		br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+		log.info("sending msg...");
+		String ReqDat = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
+		pw.println(bit_msg);
+		log.info("receiving msg...");
+		String content=null;
+		while((content=br.readLine())!=null){
+			//content = Bytes2HexString(strFromIcs.toCharArray());
+			log.info(content);
+			
+			
+		}
+
+		log.info("sending msg...");
+		String ReqDat2 = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		byte[] bit_msg2 = YctTest.HexString2Bytes(ReqDat2);
+		pw.println(bit_msg);
+		log.info("receiving msg...");
+		//String content=null;
+		/*while((byte[] content2=br.readLine())!=null){
+			//content = Bytes2HexString(strFromIcs.toCharArray());
+			log.info(content);
+			
+			
+		}*/
+	}
+	
+	public static String Stream_Send(Socket socket, String ReqDat) throws IOException{
+		OutputStream os = socket.getOutputStream();
+		InputStream is = socket.getInputStream();
+		
+		log.info("sending msg...");
+		log.info(ReqDat);
+		byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
+		os.write(bit_msg);
+		log.info("receiving msg...");
+		int hasRead =0;
+		int totleRead=0;
+		byte[] bbuf = new byte[1024];
+		if((hasRead=is.read(bbuf))>0){
+			totleRead+=hasRead;
+			log.info(1);
+		}
+		byte[] _bbuf=new byte[totleRead];
+		for(int i=0; i<totleRead;i++){
+			_bbuf[i]=bbuf[i];
+		}
+		String content = Bytes2HexString(_bbuf);
+		log.info(content);
+		return content;
+
+	}
+	
+	public static void Stream() throws IOException{
+		//Socket socket = new Socket("10.240.13.201", 5003);
+		Socket socket = new Socket();
+		socket.connect(new InetSocketAddress("10.240.13.201", 5003));
+
+		//String ReqDat = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		//String ReqDat = "FE0300018380008077B2131B8F170CDD77B2131B8F170CDDAA2542638008A38675987E61E511ECB1F5510B8DFAA673853C91DC71C76D168C77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDDA85DEE21F300888A491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		//String ReqDat = "AA630001028000986B2A3DE0B49A138222402C0DB56665C3315A766677B05DDC006AF679B9A906F4F5C9722F6210806D08757FF6FF2EB247BE2CE80DBF1EA20CEC90C13ADE5ADA00252C4EA060D6D82C6C4B3CE5E3C55BD059C75C22640F8DB55A21BEEAAF282540A9FCDD5C5938F2338BC26E086C7616FCE33BCA50A62E62AD8F27269FA37757E322ABD769CA0B6CA744AA1282F87B34ACAC0A0E3A441C9576";
+		//签到1
+		Stream_Send(socket, "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
+		if(socket.isClosed()){
+			log.info("socket closed");
+		}else{
+			log.info("socket opened");
+		}
+		if(socket.isConnected()){
+			log.info("socket Connected");
+		}else{
+			log.info("socket not Connected");
+		}
+		if(socket.isInputShutdown()){
+			log.info("socket InputShutdown");
+		}else{
+			log.info("socket not InputShutdown");
+		}
+		if(socket.isOutputShutdown()){
+			log.info("socket OutputShutdown");
+		}else{
+			log.info("socket not OutputShutdown");
+		}
+		//签到2
+		Stream_Send(socket, "FE0300018380008077B2131B8F170CDD77B2131B8F170CDDAA2542638008A38675987E61E511ECB1F5510B8DFAA673853C91DC71C76D168C77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDDA85DEE21F300888A491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
+		/*Socket socket2 = new Socket();
+		socket2.connect(new InetSocketAddress("10.240.13.201", 5003));
+		Stream_Send(socket2, "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");*/
+	}
+	
 	public static String convertStringToHex(String str) {
 
 		char[] chars = str.toCharArray();
@@ -94,7 +153,7 @@ public class YctTest {
 
 			temp.append(decimal);
 		}
-		System.out.println("Decimal : " + temp.toString());
+		log.info("Decimal : " + temp.toString());
 
 		return sb.toString();
 	}
@@ -143,7 +202,7 @@ public class YctTest {
 	     }
 	     System.out.print(hex.toUpperCase() + " ");
 	   }
-	   System.out.println("");
+	   log.info("");
 	}
 	/**
 	  *
