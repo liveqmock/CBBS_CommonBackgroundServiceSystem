@@ -34,7 +34,7 @@ public class CommunicationProtocol {
 	 * @return 返回报文
 	 */
 	public static String YctLogin(String inputstr){
-		//log.info(sockets);
+		log.info(sockets);
 
 		//从报文得到签到阶段标志
 		String Loglvl = inputstr.substring(0,1);
@@ -65,7 +65,7 @@ public class CommunicationProtocol {
 			}finally{
 			    /*try{
 			    	if(null!=osInside){
-			    		osInside.close();
+			    		osInside=null;
 			    	}
 			    	if(null!=isInside){
 			    		isInside.close();
@@ -81,60 +81,45 @@ public class CommunicationProtocol {
 			Socket socket = sockets.get(ScktID);
 
 			//log.info(socket);
-			if(socket==null||socket.isClosed()){
+			if(socket==null){
 				return "socket null";
 			}
+			if(socket.isClosed()){
+				return "socket closed";
+			}
 			//外发报文进行通讯并返回
+
 			try {
-
-				//外发报文进行通讯并返回
-				osInside = socket.getOutputStream();
-				isInside = socket.getInputStream();
-				log.info("sending msg...");
-				osInside.write(YctTest.HexString2Bytes(ReqDat));
-
-				log.info("receiving msg...");
-				byte[] msgInputOutside = new byte[1024];
-				int totleRead = 0;
-				int hasRead =0;
-				//String content="";
-				while((hasRead=isInside.read(msgInputOutside))>0){
-					//fos.write(bbuf, 0, hasRead);
-					//fos.flush();
-					totleRead+=hasRead;
-				}
-				byte[] bit_msg = new byte[totleRead];
-				for(int i=0;i<totleRead;i++){
-					bit_msg[i]=msgInputOutside[i];
-				}
-				log.info(YctTest.Bytes2HexString(bit_msg));
-				return YctTest.Bytes2HexString(bit_msg);
+				return YctTest.Stream_Send(socket, ReqDat);
 				
 			}  catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
 				log.trace(e);
 				//通讯错误返回:272个9
 				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
-			}/*finally{
+			}finally{
 			    try{
+					OutputStream osInside = socket.getOutputStream();
+					InputStream isInside = socket.getInputStream();
 			    	if(null!=osInside){
 			    		osInside.close();
 			    	}
 			    	if(null!=isInside){
 			    		isInside.close();
 			    	}
+			    	if(null!=socket){
+			    		socket.close();
+			    	}
+			    	sockets.remove(ScktID);
 			    }catch(IOException e){
 			    	log.error("释放资源错误:"+e.getMessage());
 			    }
-		    }*/
-		    
-
-
+		    }
 			
 		}else{//不存在的数据
 			return "未知类型";
 		}
-		
+
 		//TODO 判断Socket是否超时,如果是立即释放Socket
 	}
 

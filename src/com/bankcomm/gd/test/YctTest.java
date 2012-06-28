@@ -65,25 +65,34 @@ public class YctTest {
 		OutputStream os = socket.getOutputStream();
 		InputStream is = socket.getInputStream();
 		
-		log.info("sending msg...");
-		log.info(ReqDat);
-		byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
-		os.write(bit_msg);
-		log.info("receiving msg...");
-		int hasRead =0;
-		int totleRead=0;
-		byte[] bbuf = new byte[1024];
-		if((hasRead=is.read(bbuf))>0){
-			totleRead+=hasRead;
-			log.info(1);
+		try{
+			log.info("sending msg...");
+			log.info(ReqDat);
+			byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
+			os.write(bit_msg);
+			log.info("receiving msg...");
+			int hasRead =0;
+			int totleRead=0;
+			byte[] bbuf = new byte[1024];
+			if((hasRead=is.read(bbuf))>0){
+				totleRead+=hasRead;
+				log.info(1);
+			}
+			byte[] _bbuf=new byte[totleRead];
+			for(int i=0; i<totleRead;i++){
+				_bbuf[i]=bbuf[i];
+			}
+			String content = Bytes2HexString(_bbuf);
+			log.info(content);
+			return content;
+		}finally{
+	    	/*if(null!=os){
+	    		os=null;
+	    	}
+	    	if(null!=is){
+	    		is.close();
+	    	}*/
 		}
-		byte[] _bbuf=new byte[totleRead];
-		for(int i=0; i<totleRead;i++){
-			_bbuf[i]=bbuf[i];
-		}
-		String content = Bytes2HexString(_bbuf);
-		log.info(content);
-		return content;
 
 	}
 	
