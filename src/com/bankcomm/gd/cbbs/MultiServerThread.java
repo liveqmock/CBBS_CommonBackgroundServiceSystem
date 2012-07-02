@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * ÊØ»¤½ø³Ì
- * @author gu.qm
  *
  */
 public class MultiServerThread extends Thread {

@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * 通用后台系统主类，用于守护相关程序端口
- * @author gu.qm
  *
  */
 public class CommonServer {
