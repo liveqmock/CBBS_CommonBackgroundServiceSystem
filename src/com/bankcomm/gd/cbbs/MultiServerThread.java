@@ -25,7 +25,7 @@ public class MultiServerThread extends Thread {
 			CommunicationProtocol cp = new CommunicationProtocol();
 			// to give this outputLine a default value.
 			
-			// using the printWriter to write the message from the serversockts to client sockets
+			// using the printWriter to write the message from the serversockets to client sockets
 			
 			while((userInput=br.readLine())!=null){
 				System.out.println("SERVER RECEIVES THE DATA FRMO CLIENT SIDE: "+userInput);
