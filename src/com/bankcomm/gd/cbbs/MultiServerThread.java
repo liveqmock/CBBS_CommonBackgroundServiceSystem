@@ -44,6 +44,14 @@ public class MultiServerThread extends Thread {
 			// to give this outputLine a default value.
 			String serverFeedback="This is the predefined statment.";
 			
+<<<<<<< HEAD
+			// using the printWriter to write the message from the serversockets to client sockets
+			
+			while((userInput=br.readLine())!=null){
+				System.out.println("SERVER RECEIVES THE DATA FRMO CLIENT SIDE: "+userInput);
+				serverFeedback=cp.processInput(userInput);
+				System.out.println("SERVER RESPONSE THE DATA TO CLIENT SIDE: "+serverFeedback);
+=======
 			// using the printWriter to write the message from the serversockts to client sockets
 			String strFromIcs=null;
 			while((strFromIcs=br.readLine())!=null){
@@ -52,6 +60,7 @@ public class MultiServerThread extends Thread {
 				CommunicationProtocol cp = new CommunicationProtocol();
 				serverFeedback=cp.processInput(strFromIcs);
 				log.info("SERVER RESPONSE THE DATA TO ICS: ["+serverFeedback+"]");
+>>>>>>> f382592295e707352d6610ce22b33ba974899d2a
 				pw.println(serverFeedback);
 				
 			}
