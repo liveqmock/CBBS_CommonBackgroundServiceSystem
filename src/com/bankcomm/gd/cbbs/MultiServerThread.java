@@ -6,6 +6,9 @@ import java.io.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.bankcomm.gd.cbbs.workflow.WorkFlowFactory;
+import com.bankcomm.gd.cbbs.workflow.WorkFlow;
+
 /**
  * ÊØ»¤½ø³Ì
  *
@@ -49,7 +52,10 @@ public class MultiServerThread extends Thread {
 				log.info("SERVER RECEIVES THE DATA FRMO ICS: ["+strFromIcs+"]");
 				//new a protocol object
 				//CommunicationProtocol cp = new CommunicationProtocol();
-				serverFeedback=CommunicationProtocol.YctLogin(strFromIcs);
+				String serverType = strFromIcs.substring(0,6);
+				String msgBody = strFromIcs.substring(6);
+				WorkFlow workFlowObject = WorkFlowFactory.getWorkFlowObject(serverType);
+				serverFeedback=workFlowObject.execute(msgBody);
 				log.info("SERVER RESPONSE THE DATA TO ICS: ["+serverFeedback+"]");
 				pw.println(serverFeedback);
 				
