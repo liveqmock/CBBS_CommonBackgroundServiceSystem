@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.bankcomm.gd.cbbs.CommunicationProtocol;
-import com.bankcomm.gd.test.YctTest;
+import com.bankcomm.gd.util.Code;
 
 public class YctWorkFlow implements WorkFlow {
 
@@ -62,7 +62,7 @@ public class YctWorkFlow implements WorkFlow {
 				sockets_timeout.put(ScktID, new Date().getTime());
 				//log.info(sockets.get(ScktID));
 				//外发报文进行通讯并返回
-				return YctTest.Stream_Send(socket, ReqDat);
+				return this.Stream_Send(socket, ReqDat);
 
 			} catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
@@ -97,7 +97,7 @@ public class YctWorkFlow implements WorkFlow {
 			//外发报文进行通讯并返回
 
 			try {
-				return YctTest.Stream_Send(socket, ReqDat);
+				return this.Stream_Send(socket, ReqDat);
 				
 			}  catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
@@ -131,6 +131,42 @@ public class YctWorkFlow implements WorkFlow {
 		//TODO 判断Socket是否超时,如果是立即释放Socket
 	}
 
+	private String Stream_Send(Socket socket, String ReqDat) throws IOException{
+		OutputStream os = socket.getOutputStream();
+		InputStream is = socket.getInputStream();
+		
+		try{
+			log.info("sending msg...");
+			log.info(ReqDat);
+			byte[] bit_msg = Code.HexString2Bytes(ReqDat);
+			os.write(bit_msg);
+			log.info("receiving msg...");
+			int hasRead =0;
+			int totleRead=0;
+			byte[] bbuf = new byte[1024];
+			if((hasRead=is.read(bbuf))>0){
+				totleRead+=hasRead;
+				log.info(1);
+			}
+			byte[] _bbuf=new byte[totleRead];
+			for(int i=0; i<totleRead;i++){
+				_bbuf[i]=bbuf[i];
+			}
+			String content = Code.Bytes2HexString(_bbuf);
+			log.info(content);
+			return content;
+		}finally{
+	    	/*if(null!=os){
+	    		os=null;
+	    	}
+	    	if(null!=is){
+	    		is.close();
+	    	}*/
+		}
+
+	}
+
+	
 	/**
 	 * 检查Socket是否超时(超时时间为5分钟),超时关闭socket并清空sockets和sockets_timeout
 	 */

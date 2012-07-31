@@ -12,6 +12,9 @@ import java.net.InetSocketAddress;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.bankcomm.gd.cbbs.workflow.WorkFlow;
+import com.bankcomm.gd.cbbs.workflow.WorkFlowFactory;
+
 
 public class YctTest {
 
@@ -26,7 +29,7 @@ public class YctTest {
 
 	}
 
-	public static void Writer_Reader() throws IOException{
+	/*public static void Writer_Reader() throws IOException{
 		PrintWriter pw = null;
 		BufferedReader br = null;
 		Socket socket = new Socket();
@@ -59,53 +62,24 @@ public class YctTest {
 			
 			
 		}*/
-	}
+	/*}*/
 	
-	public static String Stream_Send(Socket socket, String ReqDat) throws IOException{
-		OutputStream os = socket.getOutputStream();
-		InputStream is = socket.getInputStream();
-		
-		try{
-			log.info("sending msg...");
-			log.info(ReqDat);
-			byte[] bit_msg = YctTest.HexString2Bytes(ReqDat);
-			os.write(bit_msg);
-			log.info("receiving msg...");
-			int hasRead =0;
-			int totleRead=0;
-			byte[] bbuf = new byte[1024];
-			if((hasRead=is.read(bbuf))>0){
-				totleRead+=hasRead;
-				log.info(1);
-			}
-			byte[] _bbuf=new byte[totleRead];
-			for(int i=0; i<totleRead;i++){
-				_bbuf[i]=bbuf[i];
-			}
-			String content = Bytes2HexString(_bbuf);
-			log.info(content);
-			return content;
-		}finally{
-	    	/*if(null!=os){
-	    		os=null;
-	    	}
-	    	if(null!=is){
-	    		is.close();
-	    	}*/
-		}
 
-	}
 	
 	public static void Stream() throws IOException{
 		//Socket socket = new Socket("10.240.13.201", 5003);
 		Socket socket = new Socket();
 		socket.connect(new InetSocketAddress("10.240.13.201", 5003));
 
+		WorkFlow workFlowObject = WorkFlowFactory.getWorkFlowObject("YCTLOG");
 		//String ReqDat = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
 		//String ReqDat = "FE0300018380008077B2131B8F170CDD77B2131B8F170CDDAA2542638008A38675987E61E511ECB1F5510B8DFAA673853C91DC71C76D168C77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDDA85DEE21F300888A491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
 		//String ReqDat = "AA630001028000986B2A3DE0B49A138222402C0DB56665C3315A766677B05DDC006AF679B9A906F4F5C9722F6210806D08757FF6FF2EB247BE2CE80DBF1EA20CEC90C13ADE5ADA00252C4EA060D6D82C6C4B3CE5E3C55BD059C75C22640F8DB55A21BEEAAF282540A9FCDD5C5938F2338BC26E086C7616FCE33BCA50A62E62AD8F27269FA37757E322ABD769CA0B6CA744AA1282F87B34ACAC0A0E3A441C9576";
+		//YctWorkFlow.Stream_Send(socket, "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
 		//签到1
-		Stream_Send(socket, "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
+		//TODO 添加报文头
+		String reqMsg = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		workFlowObject.execute(reqMsg);
 		if(socket.isClosed()){
 			log.info("socket closed");
 		}else{
@@ -127,13 +101,16 @@ public class YctTest {
 			log.info("socket not OutputShutdown");
 		}
 		//签到2
-		Stream_Send(socket, "FE0300018380008077B2131B8F170CDD77B2131B8F170CDDAA2542638008A38675987E61E511ECB1F5510B8DFAA673853C91DC71C76D168C77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDDA85DEE21F300888A491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
+		//Stream_Send(socket, "FE0300018380008077B2131B8F170CDD77B2131B8F170CDDAA2542638008A38675987E61E511ECB1F5510B8DFAA673853C91DC71C76D168C77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDD77B2131B8F170CDDA85DEE21F300888A491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");
+		//TODO 添加报文头
+		reqMsg = "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA";
+		workFlowObject.execute(reqMsg);
 		/*Socket socket2 = new Socket();
 		socket2.connect(new InetSocketAddress("10.240.13.201", 5003));
 		Stream_Send(socket2, "FE01000183800080491510CAF24FB6CA491510CAF24FB6CAF66D057B9F83F809A92852DFCB1CB40E841178CFDA40445F491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA491510CAF24FB6CA");*/
 	}
 	
-	public static String convertStringToHex(String str) {
+	/*public static String convertStringToHex(String str) {
 
 		char[] chars = str.toCharArray();
 
@@ -143,9 +120,9 @@ public class YctTest {
 		}
 
 		return hex.toString();
-	}
+	}*/
 
-	public static String convertHexToString(String hex) {
+	/*public static String convertHexToString(String hex) {
 
 		StringBuilder sb = new StringBuilder();
 		StringBuilder temp = new StringBuilder();
@@ -165,29 +142,16 @@ public class YctTest {
 		log.info("Decimal : " + temp.toString());
 
 		return sb.toString();
-	}
+	}*/
 
-	/**
-	  * 将两个ASCII字符合成一个字节；
-	  * 如："EF"--> 0xEF
-	  * @param src0 byte
-	  * @param src1 byte
-	  * @return byte
-	  */
-	public static byte uniteBytes(byte src0, byte src1) {
-	   byte _b0 = Byte.decode("0x" + new String(new byte[]{src0})).byteValue();
-	   _b0 = (byte)(_b0 << 4);
-	   byte _b1 = Byte.decode("0x" + new String(new byte[]{src1})).byteValue();
-	   byte ret = (byte)(_b0 ^ _b1);
-	   return ret;
-	}
+
 	/**
 	  * 将指定字符串src，以每两个字符分割转换为16进制形式
 	  * 如："2B44EFD9" --> byte[]{0x2B, 0x44, 0xEF, 0xD9}
 	  * @param src String
 	  * @return byte[]
 	  */
-	public static byte[] HexString2Bytes(String src){
+	/*public static byte[] HexString2Bytes(String src){
 		int strLength = src.length()/2;
 	   byte[] ret = new byte[strLength];
 	   byte[] tmp = src.getBytes();
@@ -195,14 +159,14 @@ public class YctTest {
 	     ret[i] = uniteBytes(tmp[i*2], tmp[i*2+1]);
 	   }
 	   return ret;
-	}
+	}*/
 	/**
 	  * 将指定byte数组以16进制的形式打印到控制台
 	  * @param hint String
 	  * @param b byte[]
 	  * @return void
 	  */
-	public static void printHexString(String hint, byte[] b) {
+	/*public static void printHexString(String hint, byte[] b) {
 	   System.out.print(hint);
 	   for (int i = 0; i < b.length; i++) {
 	     String hex = Integer.toHexString(b[i] & 0xFF);
@@ -212,21 +176,6 @@ public class YctTest {
 	     System.out.print(hex.toUpperCase() + " ");
 	   }
 	   log.info("");
-	}
-	/**
-	  *
-	  * @param b byte[]
-	  * @return String
-	  */
-	public static String Bytes2HexString(byte[] b) {
-	   String ret = "";
-	   for (int i = 0; i < b.length; i++) {
-	     String hex = Integer.toHexString(b[i] & 0xFF);
-	     if (hex.length() == 1) {
-	       hex = '0' + hex;
-	     }
-	     ret += hex.toUpperCase();
-	   }
-	   return ret;
-	}
+	}*/
+
 }
