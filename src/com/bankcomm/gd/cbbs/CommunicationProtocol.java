@@ -21,7 +21,7 @@ import com.bocom.eb.des.EBDES;
 
 /**
  * ´¦ÀíÂß¼­
- *
+ * @deprecated
  */
 public class CommunicationProtocol {
 

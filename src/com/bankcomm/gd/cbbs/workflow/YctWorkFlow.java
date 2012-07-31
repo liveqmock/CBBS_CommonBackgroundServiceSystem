@@ -11,16 +11,20 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.bankcomm.gd.cbbs.CommunicationProtocol;
 import com.bankcomm.gd.util.Code;
 
+/**
+ * 羊城通签到工作流
+ * @author Cruiser
+ *
+ */
 public class YctWorkFlow implements WorkFlow {
 
 	/** 保存通讯socket */
 	private static Map<String, Socket> sockets = new HashMap<String, Socket>();
 	/** 保存通讯socket创建的时间 */
 	private static Map<String, Long> sockets_timeout = new HashMap<String, Long>();
-	private static Log log = LogFactory.getLog(CommunicationProtocol.class);
+	private Log log = LogFactory.getLog(this.getClass());
 
 	/**
 	 * 羊城通签到
@@ -29,7 +33,7 @@ public class YctWorkFlow implements WorkFlow {
 	 * @Override
 	 */
 	public String execute(String inputstr){
-		log.info(sockets);
+		log.info(YctWorkFlow.sockets);
 
 		//从报文得到签到阶段标志
 		String Loglvl = inputstr.substring(0,1);
@@ -42,11 +46,11 @@ public class YctWorkFlow implements WorkFlow {
 		log.info(ReqDat);
 
 		//检查Socket是否超时(超时时间为5分钟),超时关闭socket并清空sockets和sockets_timeout
-		socketTimeOutCheck();
+		this.socketTimeOutCheck();
 		
 		if("1".equals(Loglvl)){//第一阶段处理
 			//log.info("进入签到第一阶段处理...");
-			log.info("pross 1...");
+			log.info("YCT Login 1...");
 			try {
 				//检查Map中是否已经有同一ID的socket,如果有先释放并删除
 				if(null!=sockets.get(ScktID)){
@@ -54,13 +58,13 @@ public class YctWorkFlow implements WorkFlow {
 						sockets.get(ScktID).close();
 					}
 					sockets.remove(ScktID);
+					sockets_timeout.remove(ScktID);
 				}
 				//创建Socket并添加到Map中
 				Socket socket = new Socket("10.240.13.201",5003);
-				//log.info(socket);
 				sockets.put(ScktID, socket);
 				sockets_timeout.put(ScktID, new Date().getTime());
-				//log.info(sockets.get(ScktID));
+
 				//外发报文进行通讯并返回
 				return this.Stream_Send(socket, ReqDat);
 
@@ -69,7 +73,7 @@ public class YctWorkFlow implements WorkFlow {
 				log.trace(e);
 				//通讯错误返回:272个9
 				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
-			}finally{
+			}finally{//由于签到交易需要使用同一个socket，外发两次报文，因此不释放socket资源
 			    /*try{
 			    	if(null!=osInside){
 			    		osInside=null;
@@ -83,23 +87,26 @@ public class YctWorkFlow implements WorkFlow {
 		    }
 			
 		}else if("2".equals(Loglvl)){//第二阶段处理
-			log.info("pross 2...");
+
+			log.info("YCT Login 2...");
+
 			//判断Socket不为空
 			Socket socket = sockets.get(ScktID);
 
-			//log.info(socket);
 			if(socket==null){
-				return "socket null";
+				log.error("socket null");
+				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 			}
 			if(socket.isClosed()){
-				return "socket closed";
+				log.error("socket closed");
+				return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 			}
+			
 			//外发报文进行通讯并返回
-
 			try {
 				return this.Stream_Send(socket, ReqDat);
 				
-			}  catch (IOException e) {
+			}catch (IOException e) {
 				log.error("IO错误:"+e.getMessage());
 				log.trace(e);
 				//通讯错误返回:272个9
@@ -125,10 +132,10 @@ public class YctWorkFlow implements WorkFlow {
 		    }
 			
 		}else{//不存在的数据
-			return "未知类型";
+			log.error("未知阶段类型");
+			return "99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
 		}
 
-		//TODO 判断Socket是否超时,如果是立即释放Socket
 	}
 
 	private String Stream_Send(Socket socket, String ReqDat) throws IOException{
@@ -170,9 +177,11 @@ public class YctWorkFlow implements WorkFlow {
 	/**
 	 * 检查Socket是否超时(超时时间为5分钟),超时关闭socket并清空sockets和sockets_timeout
 	 */
-	private static void socketTimeOutCheck() {
+	private void socketTimeOutCheck() {
 		for(String oneScktID:sockets_timeout.keySet()){
+
 			log.info("检查socket["+oneScktID+"]是否超时");
+			
 			if(null!=sockets_timeout.get(oneScktID)){
 				long timePass = new Date().getTime()-sockets_timeout.get(oneScktID);
 				long timePassMinute = timePass/(1000l*60l);
@@ -192,6 +201,8 @@ public class YctWorkFlow implements WorkFlow {
 						sockets_timeout.remove(oneScktID);
 					}
 				}
+			}else{//Socket超时时间为空，Socket的ID不为空
+				sockets_timeout.remove(oneScktID);
 			}
 		}
 	}
