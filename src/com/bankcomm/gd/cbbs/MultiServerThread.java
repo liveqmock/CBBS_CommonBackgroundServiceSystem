@@ -22,7 +22,7 @@ public class MultiServerThread extends Thread {
 	 * @param socket
 	 */
 	public MultiServerThread(Socket socket){
-		super("ServerSocketTest");
+		super("MultiServerThread");
 		this.socket=socket;
 	}
 
@@ -33,7 +33,7 @@ public class MultiServerThread extends Thread {
 	private MultiServerThread(){}
 
 	/**
-	 * 通过socket接收ICS请求，并返回
+	 * 通过socket接收ICS请求，并返回，与ICS使用同步短连接进行通讯
 	 */
 	public void run(){
 		PrintWriter pw = null;
@@ -44,23 +44,25 @@ public class MultiServerThread extends Thread {
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			// to give this outputLine a default value.
-			String serverFeedback="This is the predefined statment.";
+			String serverFeedback="999999";
 			
 			// using the printWriter to write the message from the serversockts to client sockets
 			String strFromIcs=null;
 			while((strFromIcs=br.readLine())!=null){
 				log.info("SERVER RECEIVES THE DATA FRMO ICS: ["+strFromIcs+"]");
-				//new a protocol object
-				//CommunicationProtocol cp = new CommunicationProtocol();
-				String serverType = strFromIcs.substring(0,6);
+				// 获得工作流类型
+				String workFlowType = strFromIcs.substring(0,6);
+				// 获得报文体
 				String msgBody = strFromIcs.substring(6);
-				WorkFlow workFlowObject = WorkFlowFactory.getWorkFlowObject(serverType);
+				// 工作流处理
+				WorkFlow workFlowObject = WorkFlowFactory.getWorkFlowObject(workFlowType);
 				serverFeedback=workFlowObject.execute(msgBody);
+				// 报文返回
 				log.info("SERVER RESPONSE THE DATA TO ICS: ["+serverFeedback+"]");
 				pw.println(serverFeedback);
 				
 			}
-			log.info("The SERVER has been shuted down.");
+			log.info("The work flow has completed.");
 			
 		} catch (IOException e) {
 			log.error("IO错误:"+e.getMessage());
