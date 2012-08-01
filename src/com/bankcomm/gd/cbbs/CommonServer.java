@@ -29,7 +29,7 @@ public class CommonServer {
 			log.error("Server ip or post is null");
 			System.exit(1);
 		}else{
-			log.info("Initialization successed. Server IP is ["+SERVER+"], POST is ["+PORT+"].");
+			log.info("Initialization successed. CTServer IP is ["+SERVER+"], POST is ["+PORT+"].");
 		}
 	}
 

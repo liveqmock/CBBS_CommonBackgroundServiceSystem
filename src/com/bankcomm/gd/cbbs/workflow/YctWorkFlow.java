@@ -36,13 +36,13 @@ public class YctWorkFlow implements WorkFlow {
 	public YctWorkFlow(){
 		PropertiesLoader propLoader = new PropertiesLoader("../ini/ServerConfig.ini");
 		SERVER = propLoader.getByName("YCT_SERVER");
-		PORT = Integer.valueOf(null==propLoader.getByName("YCT_PORT")?"0":propLoader.getByName("PORT"));
+		PORT = Integer.valueOf(null==propLoader.getByName("YCT_PORT")?"0":propLoader.getByName("YCT_PORT"));
 		log.info("==========================================");
 		if(0==PORT||null==SERVER){
 			log.error("Server ip or post is null");
 			System.exit(1);
 		}else{
-			log.info("Initialization successed. Server IP is ["+SERVER+"], POST is ["+PORT+"].");
+			log.info("Initialization successed. STServer IP is ["+SERVER+"], POST is ["+PORT+"].");
 		}
 	}
 
