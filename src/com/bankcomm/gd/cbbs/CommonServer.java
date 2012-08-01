@@ -24,12 +24,12 @@ public class CommonServer {
 		PropertiesLoader propLoader = new PropertiesLoader("../ini/ServerConfig.ini");
 		SERVER = propLoader.getByName("SERVER");
 		PORT = Integer.valueOf(null==propLoader.getByName("PORT")?"0":propLoader.getByName("PORT"));
+		log.info("==========================================");
 		if(0==PORT||null==SERVER){
-			log.error("服务器地址或端口为空");
+			log.error("Server ip or post is null");
 			System.exit(1);
 		}else{
-			log.info("==========================================");
-			log.info("初始化成功:服务器地址为["+SERVER+"],端口为["+PORT+"]");
+			log.info("Initialization successed. Server IP is ["+SERVER+"], POST is ["+PORT+"].");
 		}
 	}
 
