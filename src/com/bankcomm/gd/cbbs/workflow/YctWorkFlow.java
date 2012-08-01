@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.bankcomm.gd.cbbs.PropertiesLoader;
 import com.bankcomm.gd.util.Code;
 
 /**
@@ -20,11 +21,30 @@ import com.bankcomm.gd.util.Code;
  */
 public class YctWorkFlow implements WorkFlow {
 
+	private final int PORT;
+	private final String SERVER;
 	/** 保存通讯socket */
 	private static Map<String, Socket> sockets = new HashMap<String, Socket>();
 	/** 保存通讯socket创建的时间 */
 	private static Map<String, Long> sockets_timeout = new HashMap<String, Long>();
 	private Log log = LogFactory.getLog(this.getClass());
+
+	/**
+	 * 构造函数，初始化./ini/ServerConfig.ini文件里面的相关配置信息
+	 *
+	 */
+	public YctWorkFlow(){
+		PropertiesLoader propLoader = new PropertiesLoader("../ini/ServerConfig.ini");
+		SERVER = propLoader.getByName("YCT_SERVER");
+		PORT = Integer.valueOf(null==propLoader.getByName("YCT_PORT")?"0":propLoader.getByName("PORT"));
+		log.info("==========================================");
+		if(0==PORT||null==SERVER){
+			log.error("Server ip or post is null");
+			System.exit(1);
+		}else{
+			log.info("Initialization successed. Server IP is ["+SERVER+"], POST is ["+PORT+"].");
+		}
+	}
 
 	/**
 	 * 羊城通签到
@@ -61,7 +81,7 @@ public class YctWorkFlow implements WorkFlow {
 					sockets_timeout.remove(ScktID);
 				}
 				//创建Socket并添加到Map中
-				Socket socket = new Socket("10.240.13.201",5003);
+				Socket socket = new Socket(this.SERVER,this.PORT);
 				sockets.put(ScktID, socket);
 				sockets_timeout.put(ScktID, new Date().getTime());
 
