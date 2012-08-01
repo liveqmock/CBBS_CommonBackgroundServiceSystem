@@ -22,15 +22,15 @@ public class PropertiesLoader {
 
 		this.propertyFile=configFile;
 		if(null==this.propertyFile){
-			log.error("配置文件为空");
+			log.error("Config file is null.");
 		}else{
 			try{
 				props.load(new FileInputStream(this.propertyFile));
 			}catch(FileNotFoundException e){
-				log.error("初始化PropertiesLoader对象失败:"+e.getMessage());
+				log.error("Initialization PropertiesLoader object error:"+e.getMessage());
 				props = null;
 			}catch(IOException e){
-				log.error("初始化PropertiesLoader对象失败:"+e.getMessage());
+				log.error("Initialization PropertiesLoader object error:"+e.getMessage());
 				props = null;
 			}
 		}

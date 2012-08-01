@@ -65,7 +65,7 @@ public class MultiServerThread extends Thread {
 			log.info("The work flow has completed.");
 			
 		} catch (IOException e) {
-			log.error("IO´íÎó:"+e.getMessage());
+			log.error("IO error:"+e.getMessage());
 			log.trace(e);
 		}finally{
 		    try{
@@ -80,7 +80,7 @@ public class MultiServerThread extends Thread {
 		    	}
 
 		    }catch(IOException e){
-		    	log.error("ÊÍ·Å×ÊÔ´´íÎó:"+e.getMessage());
+		    	log.error("release resource error:"+e.getMessage());
 		    }
 	    	
 	    }
